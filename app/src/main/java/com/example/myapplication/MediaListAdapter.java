@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +38,8 @@ public class MediaListAdapter extends PagedListAdapter<Media, MediaListAdapter.M
         }
 
         void bind(Media item) {
-            idView.setText(item.getId() + item.getContent());
+            Log.d("TAG", "Binding holder for media id: " + item.getId());
+            idView.setText(item.getId() + " " + item.getContent());
         }
     }
 

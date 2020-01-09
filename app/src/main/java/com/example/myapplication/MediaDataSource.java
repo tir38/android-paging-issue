@@ -14,7 +14,7 @@ import io.reactivex.exceptions.Exceptions;
 
 public class MediaDataSource extends PageKeyedDataSource<Integer, Media> {
 
-    private static final int FIRST_PAGE = 1;
+    private static final int FIRST_PAGE = 0;
 
     private final MediaApi mediaApi;
     private final String userId;
