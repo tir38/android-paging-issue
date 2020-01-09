@@ -6,9 +6,14 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
@@ -31,6 +36,15 @@ public class MainActivity extends AppCompatActivity {
         Repository repository = new Repository(new MediaApi());
         disposable = repository
                 .getPageListOfMedia(userId)
+                .flatMap(pagedList -> {
+                    // delay the pagedlist emission long enough for it to be populated by other thread
+                    return Observable.interval(25, TimeUnit.MILLISECONDS)
+                            .filter(ignore -> !pagedList.isEmpty())
+                            .map(ignore -> pagedList)
+                            .doOnNext(list -> {
+                                Log.d("TAG", "Pagedlist size is: " + list.size());
+                            });
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

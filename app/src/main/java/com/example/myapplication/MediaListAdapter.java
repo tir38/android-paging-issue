@@ -46,11 +46,13 @@ public class MediaListAdapter extends PagedListAdapter<Media, MediaListAdapter.M
     static class MediaDiffCallback extends DiffUtil.ItemCallback<Media> {
         @Override
         public boolean areItemsTheSame(@NonNull Media oldItem, @NonNull Media newItem) {
+            Log.d("TAG", "areItemsTheSame?");
             return oldItem.getId().equals(newItem.getId());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Media oldItem, @NonNull Media newItem) {
+            Log.d("TAG", "areContentsTheSame?");
             return oldItem.equals(newItem);
         }
     }
