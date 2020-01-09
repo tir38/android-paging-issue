@@ -8,9 +8,9 @@ import io.reactivex.ObservableOnSubscribe;
 class MediaApi {
 
     static final int TIME_UNTIL_LIST_UPDATES = 10000;
+    static final int FAKE_REQUEST_DELAY = 2000;
 
-    private static final int SERVER_SIDE_PAGE_SIZE = 10;
-    private static final int FAKE_REQUEST_DELAY = 2000;
+    private static final int SERVER_SIDE_PAGE_SIZE = 20;
 
     private long initialRequestTime = System.currentTimeMillis();
 

@@ -10,7 +10,7 @@ public class Repository {
 
     private final MediaApi mediaApi;
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     public Repository(MediaApi mediaApi) {
         this.mediaApi = mediaApi;
