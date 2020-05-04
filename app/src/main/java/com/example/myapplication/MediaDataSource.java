@@ -3,8 +3,11 @@ package com.example.myapplication;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.paging.ItemKeyedDataSource;
 import androidx.paging.PageKeyedDataSource;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -12,9 +15,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.exceptions.Exceptions;
 
-public class MediaDataSource extends PageKeyedDataSource<Integer, Media> {
+public class MediaDataSource extends ItemKeyedDataSource<String, Media> {
 
-    private static final int FIRST_PAGE = 0;
+    private static final String NO_KEY = "no_key";
 
     private final MediaApi mediaApi;
     private final String userId;
@@ -26,58 +29,41 @@ public class MediaDataSource extends PageKeyedDataSource<Integer, Media> {
     }
 
     @Override
-    public void loadInitial(@NonNull final LoadInitialParams<Integer> params,
-                            @NonNull final LoadInitialCallback<Integer, Media> callback) {
+    public void loadInitial(@NonNull LoadInitialParams<String> params, @NonNull LoadInitialCallback<Media> callback) {
         Log.d("TAG", "loadInitial");
+        String initialKey = params.requestedInitialKey == null ? NO_KEY : params.requestedInitialKey;
+        int requestedLoadSize = params.requestedLoadSize;
         getPageDisposable.dispose();
-        getPageDisposable = getMediasForPage(FIRST_PAGE)
+        getPageDisposable = getMediasStartingAtKey(initialKey, requestedLoadSize)
                 .subscribe(
-                        medias -> callback.onResult(medias, null, FIRST_PAGE + 1),
+                        callback::onResult,
                         Exceptions::propagate);
     }
 
     @Override
-    public void loadBefore(@NonNull final LoadParams<Integer> params,
-                           @NonNull final LoadCallback<Integer, Media> callback) {
-        Log.d("TAG", "loadBefore");
-        Integer pageToLoad = params.key;
-
+    public void loadAfter(@NonNull LoadParams<String> params, @NonNull LoadCallback<Media> callback) {
+        int requestedLoadSize = params.requestedLoadSize;
+        String key = params.key;
         getPageDisposable.dispose();
-        getPageDisposable = getMediasForPage(pageToLoad)
+        getPageDisposable = getMediasStartingAtKey(key, requestedLoadSize)
                 .subscribe(
-                        medias -> {
-                            //if there is a previous page the decrement, or if desired page = 1 then there is no
-                            // previous page so set adjacent as null
-                            Integer adjacentPage = (pageToLoad > FIRST_PAGE) ? pageToLoad - 1 : null;
-                            callback.onResult(medias, adjacentPage);
-                        },
+                        callback::onResult,
                         Exceptions::propagate);
     }
 
     @Override
-    public void loadAfter(@NonNull final LoadParams<Integer> params,
-                          @NonNull final LoadCallback<Integer, Media> callback) {
-
-        Log.d("TAG", "loadAfter");
-        Integer pageToLoad = params.key;
-
-        getPageDisposable.dispose();
-        getPageDisposable = getMediasForPage(pageToLoad)
-                .subscribe(
-                        medias -> {
-                            // TODO how do we know from API if there are more items?
-                            // if there is a next page the increment, or if desired page = 1 then there is no next
-                            // page so set adjacent as null
-                            boolean hasMore = true;
-
-                            Integer adjacentPage = hasMore ? pageToLoad + 1 : null;
-                            callback.onResult(medias, adjacentPage);
-                        },
-                        Exceptions::propagate);
+    public void loadBefore(@NonNull LoadParams<String> params, @NonNull LoadCallback<Media> callback) {
+        // TODO we need to get data at key and "BEFORE" will need a getMediasEndingAtKey() method
     }
 
-    private Single<List<Media>> getMediasForPage(final int page) {
-        return mediaApi.getPageOfMedias(page, userId)
-                .toList();
+    @NonNull
+    @Override
+    public String getKey(@NonNull Media item) {
+        return item.getPagingKey();
+    }
+
+    private Single<List<Media>> getMediasStartingAtKey(final String key, final int size) {
+        // TODO left off here, this is the real "work" how do we juggle keys, and data and fetching new data
+
     }
 }

@@ -6,10 +6,13 @@ public class Media {
 
     private final String id;
     private final String content;
+    // key used for paging requests. We purposefully don't use ID
+    private final String pagingKey;
 
-    public Media(String id, String content) {
+    public Media(String id, String content, String pagingKey) {
         this.id = id;
         this.content = content;
+        this.pagingKey = pagingKey;
     }
 
 
@@ -22,6 +25,11 @@ public class Media {
         return content;
     }
 
+    public String getPagingKey() {
+        return pagingKey;
+    }
+
+    // TODO do we need to add paging key to equals/hashcode?
     /**
      * Use for are contents same
      *
